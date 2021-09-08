@@ -1,0 +1,22 @@
+{
+  "name": "bind-ui",
+  "version": "1.0.0",
+  "description": "htm-tool bind-ui module",
+  "main": "bind-ui.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/adf0001/bind-ui.git"
+  },
+  "author": "fwg",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/adf0001/bind-ui/issues"
+  },
+  "homepage": "https://github.com/adf0001/bind-ui#readme",
+  "dependencies": {
+    "htm-tool": "^1.0.7"
+  }
+}
