@@ -160,6 +160,35 @@ testData={		//global variable
 		return !(ret instanceof Error);
 	},
 	
+	"bindUi()": function(done){
+		ht('divResult3').innerHTML="<div></div><div></div>";
+		
+		myObjClass={
+			config: {
+				cssText: ".my-cls1{color:red;}",
+				htmlText: "<span class='my-cls1' name='sp1'>aaaaa</span> "+
+					"<label><input name='chk1' type=checkbox ></input>chk1</label> "+
+					"<label><input name='chk2' type=checkbox ></input>chk2</label> "+
+					"<button name='btn'>toggle</button> " +
+					"<button onclick=\"var el= ht.queryByName(this.parentNode,'chk1'); el.checked=!el.checked;\">toggle2</button>" +
+					"",
+				bindArray:[
+					["sp1","class","my-cls1","txtRed",2],
+					["chk1","prop","checked","txtRed",2],
+					["chk2","prop","checked","txtRed",2],
+					["btn","evt","click","toggleRed"],
+				],
+			},
+			
+			txtRed: true,
+			
+			toggleRed: function(){ this.txtRed=!this.txtRed; },
+		}
+		
+		var anyFail=false;
+		ht.bindUi( ht('divResult3').childNodes[0], Object.create( myObjClass ), null, function(err,data){ anyFail= anyFail||err; showResult(anyFail||data,2,anyFail||false); } );
+		ht.bindUi( ht('divResult3').childNodes[1], Object.create( myObjClass ), null, function(err,data){ anyFail= anyFail||err; showResult(anyFail||data,2,anyFail||false); } );
+	},
 	
 	/*
 	//code template

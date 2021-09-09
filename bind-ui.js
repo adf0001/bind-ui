@@ -4,18 +4,41 @@
 	
 	example:
 
-		var ht= require( "bindUi" );
+		var ht= require( "bind-ui" );
+		
+		var myObj={
+			config: {
+				cssText: ".my-cls1{color:red;}",
+				htmlText: "<span class='my-cls1' name='sp1'>aaaaa</span> "+
+					"<label><input name='chk1' type=checkbox ></input>chk1</label> "+
+					"<button name='btn'>toggle</button> ",
+				bindArray:[
+					["sp1","class","my-cls1","txtRed",2],
+					["chk1","prop","checked","txtRed",2],
+					["btn","evt","click","toggleRed"],
+				],
+			},
+			
+			txtRed: true,
+			
+			toggleRed: function(){ this.txtRed=!this.txtRed; },
+		}
+		
+		ht.bindUi( "div1", myObj );
 */
 
 "use strict";
 
 var ht= require( "htm-tool" );
+var cq= require( "callq" );
 
 var findWithFilter= ht.findWithFilter;
 var mapValue= ht.mapValue;
 var enclosePropertyDescriptor= ht.enclosePropertyDescriptor;
 var observeSingleMutation= ht.observeSingleMutation;
 var dispatchEventByName= ht.dispatchEventByName;
+var formatError= ht.formatError;
+var ele= ht.ele;
 
 //////////////////////////////////////////////////////////////////////////////////////////
 // bind element & bind by name
@@ -196,7 +219,7 @@ var bindElement= function( el, obj, bindItem ){
 		var v0;
 		if( type==="attr" ){		//bind attribute
 			//variable member
-			v0= findWithFilter( null, memberValue, mapValue(el.getAttribute(typeItem)||"", jsValueMapper ) );
+			v0= findWithFilter( null, memberValue, mapValue(el.getAttribute(typeItem)||"", jsValueMapper ), "" );
 			
 			enclosePropertyDescriptor( obj, member,
 				function(v){
@@ -214,7 +237,7 @@ var bindElement= function( el, obj, bindItem ){
 		}
 		else if( type==="style" || type==="css" ){		//bind style
 			//variable member
-			var v0= findWithFilter( null, memberValue, mapValue( el.style[typeItem]||"", jsValueMapper ) );
+			var v0= findWithFilter( null, memberValue, mapValue( el.style[typeItem]||"", jsValueMapper ), "" );
 			
 			enclosePropertyDescriptor( obj, member,
 				function(v){
@@ -232,7 +255,7 @@ var bindElement= function( el, obj, bindItem ){
 		}
 		else if( type==="class" ){		//bind class
 			//variable member
-			var v0= findWithFilter( null, memberValue, mapValue( el.classList.contains(typeItem), jsValueMapper ) );
+			var v0= findWithFilter( null, memberValue, mapValue( el.classList.contains(typeItem), jsValueMapper ), false );
 			
 			enclosePropertyDescriptor( obj, member,
 				function(v){
@@ -340,7 +363,119 @@ var bindByName= function( el, obj, bindItemArray ){
 		ret= bindElement( elLast, obj, bi );
 		if( ret instanceof Error ) return ret;
 	}
-	return true;
+	return nm;
+}
+
+//object member tool, to get name mapping item element.
+function nme(name) {
+	return (this.nm && (name in this.nm)) ? document.getElementById(this.nm[name]) : null;
+}
+
+/*
+	async binding dom-ui to js-object
+	
+	config:
+		
+		.cssText
+		.cssFile
+		.cssUrl
+		//.cssLoaded		//internal
+		//.cssId			//internal
+		
+		.htmlText
+		.htmlFile
+		.htmlUrl
+		
+		.bindArray
+		
+		.disableNm		//disable installing name mapping tools
+			* if disableNm==false or empty, the following members will be added to `obj`,
+				obj.nm= { namePath: elId }
+					map name path to element id
+				obj.nme( namePath )
+					return the element from namePath
+*/
+var bindUi= function( el, obj, config, cb ){
+	//arguments
+	if( typeof config==="function" && arguments.length==3 ){ cb= config; config= null; }
+	
+	if( ! config ){ config= obj.config || obj; }
+	
+	el= ht(el);
+	
+	//bind
+	cq( null,[
+		//try load cssFile or cssUrl to cssText
+		function( err, data, que){
+			if(err) return ht.Error(err);
+			
+			if( config.cssLoaded ) return false;
+			if( config.cssText || config.cssText==="" ) return true;
+			if( ! config.cssFile && ! config.cssUrl ) return false;
+			
+			config.cssText="";
+			ht.httpRequest( config.cssUrl||config.cssFile, 'GET', '',
+				function(err,data){
+					if( err ) { que.next(err.error); return; }
+					config.cssText= data.responseText;
+					que.next(null,true);
+				}
+			);
+		},
+		//add cssText
+		function( err, data, que){
+			if(err) return ht.Error(err);
+			
+			if( data && config.cssText && !config.cssLoaded ){
+				ht.addCssText(config.cssText,config.cssId || (config.cssId=ht.eleId(null,"bind-css-")) );
+				//console.log("addCssText " + config.cssId );
+				config.cssLoaded= true;		//set loaded flag
+			}
+			return true;
+		},
+		//try load htmlFile or htmlUrl to htmlText
+		function( err, data, que){
+			if(err) return ht.Error(err);
+			
+			if( config.htmlText || config.htmlText==="" ) return true;
+			if( ! config.htmlFile && ! config.htmlUrl ) return false;
+			
+			config.htmlText="";
+			ht.httpRequest( config.htmlUrl||config.htmlFile, 'GET', '',
+				function(err,data){
+					if( err ) { que.next(err.error); return; }
+					config.htmlText= data.responseText;
+					que.next(null,true);
+				}
+			);
+		},
+		//set htmlText - bindByName - install name-mapping tools
+		function( err, data, que){
+			if(err) return ht.Error(err);
+			
+			//set htmlText
+			if( data && config.htmlText ){
+				el.innerHTML = config.htmlText.replace(/\{\{\s*([^\s\}\:]+)\s*(\:([^\}]*))?\}\}/g, "<span name='$1'>$3</span>");
+			}
+			
+			//bindByName
+			if( config.bindArray ){
+				var nm= bindByName( el, obj, config.bindArray );
+				if( nm instanceof Error ) return nm;
+				
+				//install name-mapping tools
+				if( nm && !config.disableNm ){
+					obj.nm= nm;
+					obj.nme= nme;
+				}
+			}
+			
+			return true;
+		},
+		cb
+	]);
+	
+	
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -351,6 +486,7 @@ module.exports= Object.assign(
 	{
 		bindElement: bindElement,
 		bindByName: bindByName,
+		bindUi: bindUi,
 	}
 );
 
