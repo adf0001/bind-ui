@@ -190,6 +190,31 @@ testData={		//global variable
 		ht.bindUi( ht('divResult3').childNodes[1], Object.create( myObjClass ), null, function(err,data){ anyFail= anyFail||err; showResult(anyFail||data,2,anyFail||false); } );
 	},
 	
+	"bindUi()/url": function(done){
+		ht('divResult3').innerHTML="<div></div><div></div>";
+		
+		myObjClass={
+			config: {
+				cssFile: "1.css",
+				htmlUrl: "1.html",
+				bindArray:[
+					["sp1","class","my-cls1","txtRed",2],
+					["chk1","prop","checked","txtRed",2],
+					["chk2","prop","checked","txtRed",2],
+					["btn","evt","click","toggleRed"],
+				],
+			},
+			
+			txtRed: true,
+			
+			toggleRed: function(){ this.txtRed=!this.txtRed; },
+		}
+		
+		var anyFail=false;
+		ht.bindUi( ht('divResult3').childNodes[0], Object.create( myObjClass ), null, function(err,data){ if(err) console.log(err); anyFail= anyFail||err; showResult(anyFail||data,2,anyFail||false); } );
+		ht.bindUi( ht('divResult3').childNodes[1], Object.create( myObjClass ), null, function(err,data){ if(err) console.log(err); anyFail= anyFail||err; showResult(anyFail||data,2,anyFail||false); } );
+	},
+	
 	/*
 	//code template
 	"": function(done){

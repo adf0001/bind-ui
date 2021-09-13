@@ -379,7 +379,6 @@ function nme(name) {
 		.cssText
 		.cssFile
 		.cssUrl
-		//.cssLoaded		//internal
 		//.cssId			//internal
 		
 		.htmlText
@@ -409,15 +408,19 @@ var bindUi= function( el, obj, config, cb ){
 		function( err, data, que){
 			if(err) return ht.Error(err);
 			
-			if( config.cssLoaded ) return false;
-			if( config.cssText || config.cssText==="" ) return true;
+			if( config.cssId && ht(config.cssId) ) return false;
+			if( typeof config.cssText ==="string" ) return true;
+			if( config.cssText instanceof cq.class ){
+				config.cssText.join( function(err,data){ que.next(err,true); } );
+				return;
+			}
 			if( ! config.cssFile && ! config.cssUrl ) return false;
 			
-			config.cssText="";
+			config.cssText= que;
 			ht.httpRequest( config.cssUrl||config.cssFile, 'GET', '',
 				function(err,data){
 					if( err ) { que.next(err.error); return; }
-					config.cssText= data.responseText;
+					config.cssText= data.responseText||"";
 					que.next(null,true);
 				}
 			);
@@ -426,10 +429,9 @@ var bindUi= function( el, obj, config, cb ){
 		function( err, data, que){
 			if(err) return ht.Error(err);
 			
-			if( data && config.cssText && !config.cssLoaded ){
+			if( data && config.cssText && !( config.cssId && ht(config.cssId) ) ){
 				ht.addCssText(config.cssText,config.cssId || (config.cssId=ht.eleId(null,"bind-css-")) );
 				//console.log("addCssText " + config.cssId );
-				config.cssLoaded= true;		//set loaded flag
 			}
 			return true;
 		},
@@ -437,14 +439,18 @@ var bindUi= function( el, obj, config, cb ){
 		function( err, data, que){
 			if(err) return ht.Error(err);
 			
-			if( config.htmlText || config.htmlText==="" ) return true;
+			if( typeof config.htmlText ==="string" ) return true;
+			if( config.htmlText instanceof cq.class ){
+				config.htmlText.join( function(err,data){ que.next(err,true); } );
+				return;
+			}
 			if( ! config.htmlFile && ! config.htmlUrl ) return false;
 			
-			config.htmlText="";
+			config.htmlText=que;
 			ht.httpRequest( config.htmlUrl||config.htmlFile, 'GET', '',
 				function(err,data){
 					if( err ) { que.next(err.error); return; }
-					config.htmlText= data.responseText;
+					config.htmlText= data.responseText||"";
 					que.next(null,true);
 				}
 			);
@@ -472,7 +478,10 @@ var bindUi= function( el, obj, config, cb ){
 			
 			return true;
 		},
-		cb
+		function( err, data, que){
+			cb( err, data );
+			que.next(err,data);
+		},
 	]);
 	
 	
