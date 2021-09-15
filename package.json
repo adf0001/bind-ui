@@ -17,7 +17,7 @@
   },
   "homepage": "https://github.com/adf0001/bind-ui#readme",
   "dependencies": {
-    "callq": "^1.0.2",
-    "htm-tool": "^1.0.7"
+    "callq": "^1.0.3",
+    "htm-tool": "^1.0.9"
   }
 }

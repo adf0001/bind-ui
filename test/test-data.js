@@ -193,9 +193,9 @@ testData={		//global variable
 	"bindUi()/url": function(done){
 		ht('divResult3').innerHTML="<div></div><div></div>";
 		
-		myObjClass={
+		var myObjClass={
 			config: {
-				cssFile: "1.css",
+				cssUrl: "1.css",
 				htmlUrl: "1.html",
 				bindArray:[
 					["sp1","class","my-cls1","txtRed",2],
@@ -213,6 +213,24 @@ testData={		//global variable
 		var anyFail=false;
 		ht.bindUi( ht('divResult3').childNodes[0], Object.create( myObjClass ), null, function(err,data){ if(err) console.log(err); anyFail= anyFail||err; showResult(anyFail||data,2,anyFail||false); } );
 		ht.bindUi( ht('divResult3').childNodes[1], Object.create( myObjClass ), null, function(err,data){ if(err) console.log(err); anyFail= anyFail||err; showResult(anyFail||data,2,anyFail||false); } );
+	},
+	
+	"bindUi()/abs url": function(done){
+		ht('divResult3').innerHTML="<div></div><div></div>";
+		
+		var anyFail=false;
+		ht.bindUi( ht('divResult3').childNodes[0], Object.create( myObjClass2 ), null, function(err,data){ if(err) console.log(err); anyFail= anyFail||err; showResult(anyFail||data,2,anyFail||false); } );
+		ht.bindUi( ht('divResult3').childNodes[1], Object.create( myObjClass2 ), null, function(err,data){ if(err) console.log(err); anyFail= anyFail||err; showResult(anyFail||data,2,anyFail||false); } );
+	},
+	
+	"bindUi()/require": function(done){
+		ht('divResult3').innerHTML="<div></div><div></div>";
+		
+		var myObjClass3= require( "cls-3" );	//build bundle by dev-1-browserify-watchify-test.bat
+		
+		var anyFail=false;
+		ht.bindUi( ht('divResult3').childNodes[0], Object.create( myObjClass3 ), null, function(err,data){ if(err) console.log(err); anyFail= anyFail||err; showResult(anyFail||data,2,anyFail||false); } );
+		ht.bindUi( ht('divResult3').childNodes[1], Object.create( myObjClass3 ), null, function(err,data){ if(err) console.log(err); anyFail= anyFail||err; showResult(anyFail||data,2,anyFail||false); } );
 	},
 	
 	/*

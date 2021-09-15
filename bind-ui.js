@@ -366,33 +366,41 @@ var bindByName= function( el, obj, bindItemArray ){
 	return nm;
 }
 
-//object member tool, to get name mapping item element.
-function nme(name) {
-	return (this.nm && (name in this.nm)) ? document.getElementById(this.nm[name]) : null;
-}
-
 /*
 	async binding dom-ui to js-object
 	
 	config:
 		
+		.cssUrl					// abs url, cssUrl => cssUrlText
 		.cssText
-		.cssFile
-		.cssUrl
-		//.cssId			//internal
+		//.cssId				// internal, indicated dom style element id
 		
+		.htmlUrl				// abs url, htmlUrl => htmlUrlText
 		.htmlText
-		.htmlFile
-		.htmlUrl
 		
-		.bindArray
+		.bindArray				//refer to bindByName() & bindElement()
 		
-		.disableNm		//disable installing name mapping tools
-			* if disableNm==false or empty, the following members will be added to `obj`,
-				obj.nm= { namePath: elId }
-					map name path to element id
-				obj.nme( namePath )
-					return the element from namePath
+		.nameTool				//name mapping tools
+			
+			"static"	default
+			
+				add following members to `obj`,
+			
+					obj.nme( namePath )
+						return the element from namePath, by static id mapping.
+			
+			"dyna"/"dynamic"
+			
+				add following members to `obj`,
+				
+					obj.nme( namePath )
+						return the element from namePath, by .queryByName().
+			
+			"disable"/false
+			
+				don't add name mapping tools
+				
+			
 */
 var bindUi= function( el, obj, config, cb ){
 	//arguments
@@ -404,64 +412,70 @@ var bindUi= function( el, obj, config, cb ){
 	
 	//bind
 	cq( null,[
-		//try load cssFile or cssUrl to cssText
+		//try load cssUrl
 		function( err, data, que){
 			if(err) return ht.Error(err);
 			
-			if( config.cssId && ht(config.cssId) ) return false;
-			if( typeof config.cssText ==="string" ) return true;
-			if( config.cssText instanceof cq.class ){
-				config.cssText.join( function(err,data){ que.next(err,true); } );
+			if( config.cssId && ht(config.cssId) ) return false;	//already loaded
+			if( ! config.cssUrl ) return true;		// 'true' to load from cssText
+			if( typeof config.cssUrlText ==="string" ) return true;
+			
+			if( cq.isQue(config.cssUrlText) ){
+				config.cssUrlText.join( function(err,data){ que.next(err,true); } );
 				return;
 			}
-			if( ! config.cssFile && ! config.cssUrl ) return false;
 			
-			config.cssText= que;
-			ht.httpRequest( config.cssUrl||config.cssFile, 'GET', '',
+			config.cssUrlText= que;
+			ht.httpRequest( config.cssUrl, 'GET', '',
 				function(err,data){
-					if( err ) { que.next(err.error); return; }
-					config.cssText= data.responseText||"";
+					config.cssUrlText= err ? (""+ err.error) : ( data.responseText||"" );
+					
+					if( err ) { que.next(err.error, true); return; }	// 'true' to load from cssText
+					
 					que.next(null,true);
 				}
 			);
 		},
-		//add cssText
+		//add cssUrlText/cssText
 		function( err, data, que){
-			if(err) return ht.Error(err);
+			if(err && data!==true ) return ht.Error(err);	//try load text even error occur
 			
-			if( data && config.cssText && !( config.cssId && ht(config.cssId) ) ){
-				ht.addCssText(config.cssText,config.cssId || (config.cssId=ht.eleId(null,"bind-css-")) );
+			if( data && (config.cssUrlText || config.cssText)  && !( config.cssId && ht(config.cssId) ) ){
+				ht.addCssText(config.cssUrlText || config.cssText,config.cssId || (config.cssId=ht.eleId(null,"bind-css-")) );
 				//console.log("addCssText " + config.cssId );
 			}
 			return true;
 		},
-		//try load htmlFile or htmlUrl to htmlText
+		//try load htmlUrl
 		function( err, data, que){
 			if(err) return ht.Error(err);
 			
-			if( typeof config.htmlText ==="string" ) return true;
-			if( config.htmlText instanceof cq.class ){
-				config.htmlText.join( function(err,data){ que.next(err,true); } );
+			if( ! config.htmlUrl ) return true;		// 'true' to load from htmlText
+			if( typeof config.htmlUrlText ==="string" ) return true;
+			
+			if( cq.isQue(config.htmlUrlText) ){
+				config.htmlUrlText.join( function(err,data){ que.next(err,true); } );
 				return;
 			}
-			if( ! config.htmlFile && ! config.htmlUrl ) return false;
 			
-			config.htmlText=que;
-			ht.httpRequest( config.htmlUrl||config.htmlFile, 'GET', '',
+			config.htmlUrlText= que;
+			ht.httpRequest( config.htmlUrl, 'GET', '',
 				function(err,data){
-					if( err ) { que.next(err.error); return; }
-					config.htmlText= data.responseText||"";
+					config.htmlUrlText= err ? (""+err.error) : (data.responseText||"");
+					
+					if( err ) { que.next(err.error, true); return; }	// 'true' to load from htmlText
+					
 					que.next(null,true);
 				}
 			);
 		},
 		//set htmlText - bindByName - install name-mapping tools
 		function( err, data, que){
-			if(err) return ht.Error(err);
+			if(err && data!==true ) return ht.Error(err);	//try load text even error occur
 			
-			//set htmlText
-			if( data && config.htmlText ){
-				el.innerHTML = config.htmlText.replace(/\{\{\s*([^\s\}\:]+)\s*(\:([^\}]*))?\}\}/g, "<span name='$1'>$3</span>");
+			//set htmlUrlText/htmlText
+			if( data && (config.htmlUrlText || config.htmlText) ){
+				el.innerHTML = (config.htmlUrlText || config.htmlText).replace(/\{\{\s*([^\s\}\:]+)\s*(\:([^\}]*))?\}\}/g, "<span name='$1'>$3</span>");
 			}
 			
 			//bindByName
@@ -470,9 +484,15 @@ var bindUi= function( el, obj, config, cb ){
 				if( nm instanceof Error ) return nm;
 				
 				//install name-mapping tools
-				if( nm && !config.disableNm ){
-					obj.nm= nm;
-					obj.nme= nme;
+				if( nm ){
+					if( config.nameTool==="disable" || (typeof config.nameTool!=="undefined" && !config.nameTool ) ){}	//disable
+					else if( config.nameTool && config.nameTool.slice(0,4)==="dyna" ){
+						var elId= ht.eleId(el);
+						obj.nme=function(namePath){ return ht.queryByName(elId,namePath);}
+					}
+					else{
+						obj.nme= function(namePath){ return (namePath in nm) ? document.getElementById(nm[namePath]) : null; }
+					}
 				}
 			}
 			
