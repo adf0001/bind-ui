@@ -226,7 +226,7 @@ testData={		//global variable
 	"bindUi()/require": function(done){
 		ht('divResult3').innerHTML="<div></div><div></div>";
 		
-		var myObjClass3= require( "cls-3" );	//build bundle by dev-1-browserify-watchify-test.bat
+		var myObjClass3= require( "cls-3" );
 		
 		var anyFail=false;
 		ht.bindUi( ht('divResult3').childNodes[0], Object.create( myObjClass3 ), null, function(err,data){ if(err) console.log(err); anyFail= anyFail||err; showResult(anyFail||data,2,anyFail||false); } );

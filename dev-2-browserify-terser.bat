@@ -1,8 +1,8 @@
 
-chcp 936
+for /F %%i in ('npm root -g') do ( set globalModulePath=%%i)
 
 set browserifyPath="browserify.cmd"
-set bundleCollapserPath="%USERPROFILE%\AppData\Roaming\npm\node_modules\bundle-collapser\plugin"
+set bundleCollapserPath="%globalModulePath%/bundle-collapser/plugin"
 set terserPath="terser.cmd"
 
 set module=bind-ui
@@ -10,6 +10,8 @@ set module=bind-ui
 if not exist ./release md release
 
 call %browserifyPath% -p %bundleCollapserPath% -o ./release/bundle.min.js -v ^
+	-t [ %globalModulePath%/stringify --extensions [.html .css .htm ] --minify true ] ^
+	-r ./test/3/cls-3.js:cls-3 ^
 	-r ./%module%.js:%module%
 
 echo on
