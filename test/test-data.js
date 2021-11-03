@@ -1,22 +1,22 @@
 
-setHtmlPage("bind-ui","10em");	//html page setting
+setHtmlPage("bind-ui", "10em");	//html page setting
 
-var ht= ( typeof module==="object" && module.exports ) ? require("../bind-ui.js") : require( "bind-ui" );
+var ht = (typeof module === "object" && module.exports) ? require("../bind-ui.js") : require("bind-ui");
 
-testData={		//global variable
-	
-	"bindByName()": function(done){
+testData = {		//global variable
+
+	"bindByName()": function (done) {
 		ht.addCssText(
-			".ht-selected{"+
-				"background:lavender;"+
-			"}"+
-			".ht-selected:hover{"+
-				"background:#F0F0FA;"+
-			"}"+
+			".ht-selected{" +
+			"background:lavender;" +
+			"}" +
+			".ht-selected:hover{" +
+			"background:#F0F0FA;" +
+			"}" +
 			""
 		);
 
-		ht('divResult3').innerHTML='\
+		ht('divResult3').innerHTML = '\
 			<span name=sp-on class=ht-cmd onclick="alert(\'original click 1, on\')">on</span>, \
 			<span name=sp-event class=ht-cmd onclick="alert(\'original click 2, evt\')">event</span>, <br>\
 		\
@@ -114,8 +114,8 @@ testData={		//global variable
 			<span name=sp-cls3-txt >bbb</span> <br>\
 		<br><br><br>';
 
-		var myObj={
-			func1: function(){alert( 'func1' );},
+		var myObj = {
+			func1: function () { alert('func1'); },
 			attr_title: 'aaaaaa',
 			inp_v: 'bbb',
 			dis_v: '',
@@ -124,115 +124,115 @@ testData={		//global variable
 			cls2_v: false,
 			cls3_v: 'state aa',
 		};
-		window.myObj=myObj;
+		window.myObj = myObj;
 
-		var myConfig=[
-			['sp-on'	,'on'		,'click'	,'func1'],
-			['sp-event'	,'event'	,'click'	,'func1'],
-			[			,			,			,function(){alert('inline func3')} ],
-			['sp-attr'	,'attr'		,'title'	,'attr_title'],
-			['sp-attr2'	,'attr'		,'title'	,'attr_title', true ],		//bi-direction
-			[			,			,			,function(){alert('inline func attr2')} ], 
-			['inp1'	,'prop'		,'value'	,'inp_v' ], 
-			['inp2'	,'prop'		,'value'	,'inp_v',	true /* { biDirection:true } */ ],		//bi-direction
-			['inp3'	,'prop'		,'value'	,'inp_v',	'input' /* { notifyEvent:'input' } */ ], 		//'input' event
-			['inp4'	,'prop'		,'value'	,'inp_v',	0x2 /* { watchJs:true } */ ], 		//watchJs
+		var myConfig = [
+			['sp-on', 'on', 'click', 'func1'],
+			['sp-event', 'event', 'click', 'func1'],
+			[, , , function () { alert('inline func3') }],
+			['sp-attr', 'attr', 'title', 'attr_title'],
+			['sp-attr2', 'attr', 'title', 'attr_title', true],		//bi-direction
+			[, , , function () { alert('inline func attr2') }],
+			['inp1', 'prop', 'value', 'inp_v'],
+			['inp2', 'prop', 'value', 'inp_v', true /* { biDirection:true } */],		//bi-direction
+			['inp3', 'prop', 'value', 'inp_v', 'input' /* { notifyEvent:'input' } */], 		//'input' event
+			['inp4', 'prop', 'value', 'inp_v', 0x2 /* { watchJs:true } */], 		//watchJs
 
-			['sp-html'	,'prop'		,'innerHTML'	,'inp_v',	0x2 /* { watchJs:true } */ ], 		//watchJs
-			['sp-text'	,'prop'		,'textContent'	,'inp_v',	0x2 /* { watchJs:true } */ ], 		//watchJs
+			['sp-html', 'prop', 'innerHTML', 'inp_v', 0x2 /* { watchJs:true } */], 		//watchJs
+			['sp-text', 'prop', 'textContent', 'inp_v', 0x2 /* { watchJs:true } */], 		//watchJs
 
-			['sp-display'	,'style'		,'display'	,'dis_v',	true ],
-			['sp-display-chk'	,'prop'		,'checked'	,'dis_v',	{ biDirection:true, valueMapper:{true:'none',false:''}} ],
-			['sp-display-chk2'	,'prop'		,{typeItem:'checked',valueMapper:{'':true,'none':false}}	,'dis_v',	{ biDirection:true, watchJs:true, valueMapper:{true:'',false:'none'}} ],
+			['sp-display', 'style', 'display', 'dis_v', true],
+			['sp-display-chk', 'prop', 'checked', 'dis_v', { biDirection: true, valueMapper: { true: 'none', false: '' } }],
+			['sp-display-chk2', 'prop', { typeItem: 'checked', valueMapper: { '': true, 'none': false } }, 'dis_v', { biDirection: true, watchJs: true, valueMapper: { true: '', false: 'none' } }],
 
-			['sp-display2'	,'style'		,{typeItem:'display',valueMapper:{false:'none',true:''}}	,'dis_v2',	{ biDirection:true, valueMapper:{'none':false,'':true}} ],
-			['sp-display2-chk'	,'prop'		,{typeItem:'checked',valueMapper:{true:false,false:true}}	,'dis_v2',	{ biDirection:true, valueMapper:{true:false,false:true}} ],
-			['sp-display2-chk2'	,'prop'		,'checked'	,'dis_v2',	0x2 ],
+			['sp-display2', 'style', { typeItem: 'display', valueMapper: { false: 'none', true: '' } }, 'dis_v2', { biDirection: true, valueMapper: { 'none': false, '': true } }],
+			['sp-display2-chk', 'prop', { typeItem: 'checked', valueMapper: { true: false, false: true } }, 'dis_v2', { biDirection: true, valueMapper: { true: false, false: true } }],
+			['sp-display2-chk2', 'prop', 'checked', 'dis_v2', 0x2],
 
-			['sp-cls'	,'class'		,'ht-selected'	,'cls_v',	true ],
-			['sp-cls2'	,'class'		,{typeItem:'ht-selected',valueMapper:{true:false,false:true}}	,'cls2_v',		{ biDirection:true, valueMapper:{true:false,false:true}} ],
-			['sp-cls3'	,'class'		,{typeItem:'ht-selected',valueMapper:function(v){console.log(v); return v.indexOf('aa')>0;}}	,'cls3_v',		{ biDirection:true, valueMapper:function(v){console.log('js',v); return 'state '+(v?'aa':'bb');}} ],
-			['sp-cls3-txt'	,'prop'		,'textContent'		,'cls3_v',  ],
+			['sp-cls', 'class', 'ht-selected', 'cls_v', true],
+			['sp-cls2', 'class', { typeItem: 'ht-selected', valueMapper: { true: false, false: true } }, 'cls2_v', { biDirection: true, valueMapper: { true: false, false: true } }],
+			['sp-cls3', 'class', { typeItem: 'ht-selected', valueMapper: function (v) { console.log(v); return v.indexOf('aa') > 0; } }, 'cls3_v', { biDirection: true, valueMapper: function (v) { console.log('js', v); return 'state ' + (v ? 'aa' : 'bb'); } }],
+			['sp-cls3-txt', 'prop', 'textContent', 'cls3_v',],
 		];
 
-		var ret= ht.bindByName('divResult3',myObj,myConfig);
-		if(ret instanceof Error) console.log(ret);
+		var ret = ht.bindByName('divResult3', myObj, myConfig);
+		if (ret instanceof Error) console.log(ret);
 		return !(ret instanceof Error);
 	},
-	
-	"bindUi()": function(done){
-		ht('divResult3').innerHTML="<div></div><div></div>";
-		
-		myObjClass={
+
+	"bindUi()": function (done) {
+		ht('divResult3').innerHTML = "<div></div><div></div>";
+
+		myObjClass = {
 			config: {
 				cssText: ".my-cls1{color:red;}",
-				htmlText: "<span class='my-cls1' name='sp1'>aaaaa</span> "+
-					"<label><input name='chk1' type=checkbox ></input>chk1</label> "+
-					"<label><input name='chk2' type=checkbox ></input>chk2</label> "+
+				htmlText: "<span class='my-cls1' name='sp1'>aaaaa</span> " +
+					"<label><input name='chk1' type=checkbox ></input>chk1</label> " +
+					"<label><input name='chk2' type=checkbox ></input>chk2</label> " +
 					"<button name='btn'>toggle</button> " +
 					"<button onclick=\"var el= ht.queryByName(this.parentNode,'chk1'); el.checked=!el.checked;\">toggle2</button>" +
 					"",
-				bindArray:[
-					["sp1","class","my-cls1","txtRed",2],
-					["chk1","prop","checked","txtRed",2],
-					["chk2","prop","checked","txtRed",2],
-					["btn","evt","click","toggleRed"],
+				bindArray: [
+					["sp1", "class", "my-cls1", "txtRed", 2],
+					["chk1", "prop", "checked", "txtRed", 2],
+					["chk2", "prop", "checked", "txtRed", 2],
+					["btn", "evt", "click", "toggleRed"],
 				],
 			},
-			
+
 			txtRed: true,
-			
-			toggleRed: function(){ this.txtRed=!this.txtRed; },
+
+			toggleRed: function () { this.txtRed = !this.txtRed; },
 		}
-		
-		var anyFail=false;
-		ht.bindUi( ht('divResult3').childNodes[0], Object.create( myObjClass ), null, function(err,data){ anyFail= anyFail||err; showResult(anyFail||data,2,anyFail||false); } );
-		ht.bindUi( ht('divResult3').childNodes[1], Object.create( myObjClass ), null, function(err,data){ anyFail= anyFail||err; showResult(anyFail||data,2,anyFail||false); } );
+
+		var anyFail = false;
+		ht.bindUi(ht('divResult3').childNodes[0], Object.create(myObjClass), null, function (err, data) { anyFail = anyFail || err; showResult(anyFail || data, 2, anyFail || false); });
+		ht.bindUi(ht('divResult3').childNodes[1], Object.create(myObjClass), null, function (err, data) { anyFail = anyFail || err; showResult(anyFail || data, 2, anyFail || false); });
 	},
-	
-	"bindUi()/url": function(done){
-		ht('divResult3').innerHTML="<div></div><div></div>";
-		
-		var myObjClass={
+
+	"bindUi()/url": function (done) {
+		ht('divResult3').innerHTML = "<div></div><div></div>";
+
+		var myObjClass = {
 			config: {
 				cssUrl: "1.css",
 				htmlUrl: "1.html",
-				bindArray:[
-					["sp1","class","my-cls1","txtRed",2],
-					["chk1","prop","checked","txtRed",2],
-					["chk2","prop","checked","txtRed",2],
-					["btn","evt","click","toggleRed"],
+				bindArray: [
+					["sp1", "class", "my-cls1", "txtRed", 2],
+					["chk1", "prop", "checked", "txtRed", 2],
+					["chk2", "prop", "checked", "txtRed", 2],
+					["btn", "evt", "click", "toggleRed"],
 				],
 			},
-			
+
 			txtRed: true,
-			
-			toggleRed: function(){ this.txtRed=!this.txtRed; },
+
+			toggleRed: function () { this.txtRed = !this.txtRed; },
 		}
-		
-		var anyFail=false;
-		ht.bindUi( ht('divResult3').childNodes[0], Object.create( myObjClass ), null, function(err,data){ if(err) console.log(err); anyFail= anyFail||err; showResult(anyFail||data,2,anyFail||false); } );
-		ht.bindUi( ht('divResult3').childNodes[1], Object.create( myObjClass ), null, function(err,data){ if(err) console.log(err); anyFail= anyFail||err; showResult(anyFail||data,2,anyFail||false); } );
+
+		var anyFail = false;
+		ht.bindUi(ht('divResult3').childNodes[0], Object.create(myObjClass), null, function (err, data) { if (err) console.log(err); anyFail = anyFail || err; showResult(anyFail || data, 2, anyFail || false); });
+		ht.bindUi(ht('divResult3').childNodes[1], Object.create(myObjClass), null, function (err, data) { if (err) console.log(err); anyFail = anyFail || err; showResult(anyFail || data, 2, anyFail || false); });
 	},
-	
-	"bindUi()/abs url": function(done){
-		ht('divResult3').innerHTML="<div></div><div></div>";
-		
-		var anyFail=false;
-		ht.bindUi( ht('divResult3').childNodes[0], Object.create( myObjClass2 ), null, function(err,data){ if(err) console.log(err); anyFail= anyFail||err; showResult(anyFail||data,2,anyFail||false); } );
-		ht.bindUi( ht('divResult3').childNodes[1], Object.create( myObjClass2 ), null, function(err,data){ if(err) console.log(err); anyFail= anyFail||err; showResult(anyFail||data,2,anyFail||false); } );
+
+	"bindUi()/abs url": function (done) {
+		ht('divResult3').innerHTML = "<div></div><div></div>";
+
+		var anyFail = false;
+		ht.bindUi(ht('divResult3').childNodes[0], Object.create(myObjClass2), null, function (err, data) { if (err) console.log(err); anyFail = anyFail || err; showResult(anyFail || data, 2, anyFail || false); });
+		ht.bindUi(ht('divResult3').childNodes[1], Object.create(myObjClass2), null, function (err, data) { if (err) console.log(err); anyFail = anyFail || err; showResult(anyFail || data, 2, anyFail || false); });
 	},
-	
-	"bindUi()/require": function(done){
-		ht('divResult3').innerHTML="<div></div><div></div>";
-		
-		var myObjClass3= require( "cls-3" );
-		
-		var anyFail=false;
-		ht.bindUi( ht('divResult3').childNodes[0], Object.create( myObjClass3 ), null, function(err,data){ if(err) console.log(err); anyFail= anyFail||err; showResult(anyFail||data,2,anyFail||false); } );
-		ht.bindUi( ht('divResult3').childNodes[1], Object.create( myObjClass3 ), null, function(err,data){ if(err) console.log(err); anyFail= anyFail||err; showResult(anyFail||data,2,anyFail||false); } );
+
+	"bindUi()/require": function (done) {
+		ht('divResult3').innerHTML = "<div></div><div></div>";
+
+		var myObjClass3 = require("cls-3");
+
+		var anyFail = false;
+		ht.bindUi(ht('divResult3').childNodes[0], Object.create(myObjClass3), null, function (err, data) { if (err) console.log(err); anyFail = anyFail || err; showResult(anyFail || data, 2, anyFail || false); });
+		ht.bindUi(ht('divResult3').childNodes[1], Object.create(myObjClass3), null, function (err, data) { if (err) console.log(err); anyFail = anyFail || err; showResult(anyFail || data, 2, anyFail || false); });
 	},
-	
+
 	/*
 	//code template
 	"": function(done){

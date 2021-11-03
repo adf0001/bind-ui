@@ -29,16 +29,16 @@
 
 "use strict";
 
-var ht= require( "htm-tool" );
-var cq= require( "callq" );
+var ht = require("htm-tool");
+var cq = require("callq");
 
-var findWithFilter= ht.findWithFilter;
-var mapValue= ht.mapValue;
-var enclosePropertyDescriptor= ht.enclosePropertyDescriptor;
-var observeSingleMutation= ht.observeSingleMutation;
-var dispatchEventByName= ht.dispatchEventByName;
-var formatError= ht.formatError;
-var ele= ht.ele;
+var findWithFilter = ht.findWithFilter;
+var mapValue = ht.mapValue;
+var enclosePropertyDescriptor = ht.enclosePropertyDescriptor;
+var observeSingleMutation = ht.observeSingleMutation;
+var dispatchEventByName = ht.dispatchEventByName;
+var formatError = ht.formatError;
+var ele = ht.ele;
 
 //////////////////////////////////////////////////////////////////////////////////////////
 // bind element & bind by name
@@ -130,238 +130,238 @@ var ele= ht.ele;
 */
 
 //bind-item index constant
-var BI_NAME_PATH=	0,
-	BI_TYPE=		1,
-	BI_TYPE_OPTION=	2,
-	BI_MEMBER=		3,
-	BI_MEMBER_OPTION=	4;
+var BI_NAME_PATH = 0,
+	BI_TYPE = 1,
+	BI_TYPE_OPTION = 2,
+	BI_MEMBER = 3,
+	BI_MEMBER_OPTION = 4;
 
 //return Error if fail
-var bindElement= function( el, obj, bindItem ){
-	
+var bindElement = function (el, obj, bindItem) {
+
 	//-------------------------------------
 	//arguments
-	
-	var elId= ht.eleId(el);
-	
+
+	var elId = ht.eleId(el);
+
 	//type
-	var type= bindItem[BI_TYPE];
-	
+	var type = bindItem[BI_TYPE];
+
 	//typeItem, typeOption
-	var typeOption= bindItem[BI_TYPE_OPTION], typeItem, domValueMapper;
-	if( typeof typeOption==="string" ){ typeItem= typeOption; typeOption= null; }
+	var typeOption = bindItem[BI_TYPE_OPTION], typeItem, domValueMapper;
+	if (typeof typeOption === "string") { typeItem = typeOption; typeOption = null; }
 	else {
-		typeItem= typeOption.typeItem;
-		domValueMapper= typeOption.valueMapper;
+		typeItem = typeOption.typeItem;
+		domValueMapper = typeOption.valueMapper;
 	}
-	
-	if( !typeItem ) return formatError("bind typeItem empty", bindItem );
-	
+
+	if (!typeItem) return formatError("bind typeItem empty", bindItem);
+
 	//member
-	var member= bindItem[BI_MEMBER];
-	
+	var member = bindItem[BI_MEMBER];
+
 	var memberValue;
-	if( typeof member==="function" ){ memberValue= member; }
-	else if( member in obj ) { memberValue= obj[member]; }
-	else return formatError("member unfound", member, bindItem );
-	
-	var memberIsFunction= ( typeof memberValue==="function" );
-	var memberThis= (!memberIsFunction || (memberValue!==member) ) ? obj : null;
-	
+	if (typeof member === "function") { memberValue = member; }
+	else if (member in obj) { memberValue = obj[member]; }
+	else return formatError("member unfound", member, bindItem);
+
+	var memberIsFunction = (typeof memberValue === "function");
+	var memberThis = (!memberIsFunction || (memberValue !== member)) ? obj : null;
+
 	//memberOption
-	var memberOption= bindItem[BI_MEMBER_OPTION], biDirection, notifyEvent,watchJs,jsValueMapper;
-	var typeofMo= typeof memberOption;
-	
-	if( typeofMo==="boolean" ) { biDirection= memberOption; memberOption= null; }
-	else if( typeofMo==="number" ){
-		biDirection= memberOption & 0x1;
-		watchJs= memberOption & 0x2;
-		memberOption= null;
+	var memberOption = bindItem[BI_MEMBER_OPTION], biDirection, notifyEvent, watchJs, jsValueMapper;
+	var typeofMo = typeof memberOption;
+
+	if (typeofMo === "boolean") { biDirection = memberOption; memberOption = null; }
+	else if (typeofMo === "number") {
+		biDirection = memberOption & 0x1;
+		watchJs = memberOption & 0x2;
+		memberOption = null;
 	}
-	else if( typeofMo==="string" ){
-		if( memberOption ) { notifyEvent= memberOption; memberOption= null; }
+	else if (typeofMo === "string") {
+		if (memberOption) { notifyEvent = memberOption; memberOption = null; }
 	}
-	else if(memberOption){
-		notifyEvent= memberOption.notifyEvent;
-		biDirection= notifyEvent || memberOption.biDirection;
-		watchJs= memberOption.watchJs;
-		jsValueMapper= memberOption.valueMapper;
+	else if (memberOption) {
+		notifyEvent = memberOption.notifyEvent;
+		biDirection = notifyEvent || memberOption.biDirection;
+		watchJs = memberOption.watchJs;
+		jsValueMapper = memberOption.valueMapper;
 	}
-	if( ! biDirection && (notifyEvent || watchJs) ) biDirection=true;
-	
+	if (!biDirection && (notifyEvent || watchJs)) biDirection = true;
+
 	//-------------------------------------
 	//bind event
-	if( type=="on" || type=="event" || type=="evt" ){
-		if( !memberIsFunction ) return formatError("bind member is not a function", member, bindItem );
-		
-		var bindFunc= function(evt){ return memberValue.apply( memberThis || this, [ evt, memberOption]); };
-		
-		if( type=="on" ){ el["on"+typeItem]= bindFunc; }
-		else{ el.addEventListener( typeItem, bindFunc, memberOption && memberOption.listenerOptions ); }
-		
+	if (type == "on" || type == "event" || type == "evt") {
+		if (!memberIsFunction) return formatError("bind member is not a function", member, bindItem);
+
+		var bindFunc = function (evt) { return memberValue.apply(memberThis || this, [evt, memberOption]); };
+
+		if (type == "on") { el["on" + typeItem] = bindFunc; }
+		else { el.addEventListener(typeItem, bindFunc, memberOption && memberOption.listenerOptions); }
+
 		return true;
 	}
-	
+
 	//-------------------------------------
 	//bind attribute group
-	if( type==="attr" || type==="style" || type==="css" || type==="class" ){
+	if (type === "attr" || type === "style" || type === "css" || type === "class") {
 		//bind attribute event
-		if( memberIsFunction ){
-			var attrName= ( type==="attr" )? typeItem : type;
-			if( attrName==="css" ) attrName= "style";
-			
-			observeSingleMutation( el, attrName,
-				function( mutationItem ){ return memberValue.apply( memberThis || this, [mutationItem, memberOption] ); }
+		if (memberIsFunction) {
+			var attrName = (type === "attr") ? typeItem : type;
+			if (attrName === "css") attrName = "style";
+
+			observeSingleMutation(el, attrName,
+				function (mutationItem) { return memberValue.apply(memberThis || this, [mutationItem, memberOption]); }
 			);
 			return true;
 		}
-		
+
 		var v0;
-		if( type==="attr" ){		//bind attribute
+		if (type === "attr") {		//bind attribute
 			//variable member
-			v0= findWithFilter( null, memberValue, mapValue(el.getAttribute(typeItem)||"", jsValueMapper ), "" );
-			
-			enclosePropertyDescriptor( obj, member,
-				function(v){
-					v=""+mapValue( v, domValueMapper );
-					if( ele(elId).getAttribute(typeItem) !==v ) ele(elId).setAttribute(typeItem,v);
+			v0 = findWithFilter(null, memberValue, mapValue(el.getAttribute(typeItem) || "", jsValueMapper), "");
+
+			enclosePropertyDescriptor(obj, member,
+				function (v) {
+					v = "" + mapValue(v, domValueMapper);
+					if (ele(elId).getAttribute(typeItem) !== v) ele(elId).setAttribute(typeItem, v);
 				},
-				function(){ return mapValue( ele(elId).getAttribute(typeItem), jsValueMapper ); }
+				function () { return mapValue(ele(elId).getAttribute(typeItem), jsValueMapper); }
 			);
-			
-			if( biDirection ) {
-				observeSingleMutation( el, typeItem,
-					function( mutationItem ){ obj[member]= mapValue( mutationItem.target.getAttribute(mutationItem.attributeName)||"", jsValueMapper ); }
+
+			if (biDirection) {
+				observeSingleMutation(el, typeItem,
+					function (mutationItem) { obj[member] = mapValue(mutationItem.target.getAttribute(mutationItem.attributeName) || "", jsValueMapper); }
 				);
 			}
 		}
-		else if( type==="style" || type==="css" ){		//bind style
+		else if (type === "style" || type === "css") {		//bind style
 			//variable member
-			var v0= findWithFilter( null, memberValue, mapValue( el.style[typeItem]||"", jsValueMapper ), "" );
-			
-			enclosePropertyDescriptor( obj, member,
-				function(v){
-					v=""+mapValue( v, domValueMapper );
-					if( ele(elId).style[typeItem] !==v ) ele(elId).style[typeItem]= v;
+			var v0 = findWithFilter(null, memberValue, mapValue(el.style[typeItem] || "", jsValueMapper), "");
+
+			enclosePropertyDescriptor(obj, member,
+				function (v) {
+					v = "" + mapValue(v, domValueMapper);
+					if (ele(elId).style[typeItem] !== v) ele(elId).style[typeItem] = v;
 				},
-				function(){ return mapValue( ele(elId).style[typeItem], jsValueMapper ); }
+				function () { return mapValue(ele(elId).style[typeItem], jsValueMapper); }
 			);
-			
-			if( biDirection ) {
-				observeSingleMutation( el, "style",
-					function( mutationItem ){ obj[member]= mapValue( mutationItem.target.style[typeItem]||"", jsValueMapper ); }
+
+			if (biDirection) {
+				observeSingleMutation(el, "style",
+					function (mutationItem) { obj[member] = mapValue(mutationItem.target.style[typeItem] || "", jsValueMapper); }
 				);
 			}
 		}
-		else if( type==="class" ){		//bind class
+		else if (type === "class") {		//bind class
 			//variable member
-			var v0= findWithFilter( null, memberValue, mapValue( el.classList.contains(typeItem), jsValueMapper ), false );
-			
-			enclosePropertyDescriptor( obj, member,
-				function(v){
-					v= !! mapValue( v, domValueMapper );
-					if( v && ! ele(elId).classList.contains(typeItem) ) ele(elId).classList.add(typeItem);
-					else if( !v && ele(elId).classList.contains(typeItem) ) ele(elId).classList.remove(typeItem);
+			var v0 = findWithFilter(null, memberValue, mapValue(el.classList.contains(typeItem), jsValueMapper), false);
+
+			enclosePropertyDescriptor(obj, member,
+				function (v) {
+					v = !!mapValue(v, domValueMapper);
+					if (v && !ele(elId).classList.contains(typeItem)) ele(elId).classList.add(typeItem);
+					else if (!v && ele(elId).classList.contains(typeItem)) ele(elId).classList.remove(typeItem);
 				},
-				function(){ return mapValue( ele(elId).classList.contains(typeItem), jsValueMapper ); }
+				function () { return mapValue(ele(elId).classList.contains(typeItem), jsValueMapper); }
 			);
-			
-			if( biDirection ) {
-				observeSingleMutation( el, "class",
-					function( mutationItem ){ obj[member]= mapValue( mutationItem.target.classList.contains(typeItem), jsValueMapper ); }
+
+			if (biDirection) {
+				observeSingleMutation(el, "class",
+					function (mutationItem) { obj[member] = mapValue(mutationItem.target.classList.contains(typeItem), jsValueMapper); }
 				);
 			}
 		}
-		
+
 		//init value
-		obj[member]= v0;
-		
+		obj[member] = v0;
+
 		return true;
 	}
-	
+
 	//-------------------------------------
 	//bind property
-	if( type==="prop" ){
-		if( !(typeItem in el ) ) return formatError("bind property unfound", typeItem, bindItem );
-		
+	if (type === "prop") {
+		if (!(typeItem in el)) return formatError("bind property unfound", typeItem, bindItem);
+
 		//function binding
-		if( memberIsFunction ){
-			var bindFunc= function(evt){ return memberValue.apply( memberThis || this, [ evt, memberOption]); };
-			el.addEventListener( notifyEvent || "change", bindFunc, memberOption && memberOption.listenerOptions );
-			if( watchJs ) {
-				enclosePropertyDescriptor( el, typeItem,
-					function(v){ dispatchEventByName( elId, notifyEvent || "change", 0 ); }
+		if (memberIsFunction) {
+			var bindFunc = function (evt) { return memberValue.apply(memberThis || this, [evt, memberOption]); };
+			el.addEventListener(notifyEvent || "change", bindFunc, memberOption && memberOption.listenerOptions);
+			if (watchJs) {
+				enclosePropertyDescriptor(el, typeItem,
+					function (v) { dispatchEventByName(elId, notifyEvent || "change", 0); }
 				);
 			}
 			return true;
 		}
-		
+
 		//variable member
-		var v0= findWithFilter( null, memberValue, mapValue(el[typeItem]||"", jsValueMapper ) );
-		
-		enclosePropertyDescriptor( obj, member,
-			function(v){
-				v= mapValue( v, domValueMapper );
-				if( ele(elId)[typeItem] !=v ) ele(elId)[typeItem]= v;
+		var v0 = findWithFilter(null, memberValue, mapValue(el[typeItem] || "", jsValueMapper));
+
+		enclosePropertyDescriptor(obj, member,
+			function (v) {
+				v = mapValue(v, domValueMapper);
+				if (ele(elId)[typeItem] != v) ele(elId)[typeItem] = v;
 			},
-			function() { return mapValue( ele(elId)[typeItem], jsValueMapper ); }
+			function () { return mapValue(ele(elId)[typeItem], jsValueMapper); }
 		);
-		
-		if( biDirection ) {
-			el.addEventListener( notifyEvent || "change", function(evt){ obj[member]= mapValue( ele(elId)[typeItem], jsValueMapper ); }, memberOption && memberOption.listenerOptions );
+
+		if (biDirection) {
+			el.addEventListener(notifyEvent || "change", function (evt) { obj[member] = mapValue(ele(elId)[typeItem], jsValueMapper); }, memberOption && memberOption.listenerOptions);
 		}
-		if( watchJs ) {
-			enclosePropertyDescriptor( el, typeItem,
-				function(v){ dispatchEventByName( elId, notifyEvent || "change", 0 ); }
+		if (watchJs) {
+			enclosePropertyDescriptor(el, typeItem,
+				function (v) { dispatchEventByName(elId, notifyEvent || "change", 0); }
 			);
 		}
-		
+
 		//init value
-		obj[member]= v0;
-		
+		obj[member] = v0;
+
 		return true;
 	}
-	
-	return formatError("unknown bind type",type,bindItem );
+
+	return formatError("unknown bind type", type, bindItem);
 }
 
 //return Error if fail
-var bindByName= function( el, obj, bindItemArray ){
-	el=ele(el);
-	
-	var elLast=el,lastName="";
-	var i,imax= bindItemArray.length, bi, ret, namePath;
-	
-	var nm={			//name mapping;
+var bindByName = function (el, obj, bindItemArray) {
+	el = ele(el);
+
+	var elLast = el, lastName = "";
+	var i, imax = bindItemArray.length, bi, ret, namePath;
+
+	var nm = {			//name mapping;
 		"": ht.eleId(elLast)	//map "" to root element
 	};
-	
-	for( i=0;i<imax;i++ ){
-		bi= bindItemArray[i];
-		namePath= bi[BI_NAME_PATH]||"";
-		if( typeof namePath !=="string" ) return formatError("bind name path is not a string", namePath, bi );
-		
-		if( ! namePath ){	//omitted "namePath"
-			bi[BI_NAME_PATH]= lastName;	//fill back omitted "namePath"
-			
-			if( i ){	//copy other omitted item from previous value
-				if( !bi[BI_TYPE] ){
-					bi[BI_TYPE]= bindItemArray[i-1][BI_TYPE];	//fill back omitted "type"
-					if( !bi[BI_TYPE_OPTION] ) bi[BI_TYPE_OPTION]= bindItemArray[i-1][BI_TYPE_OPTION];	//fill back omitted typeOption | "typeItem"
+
+	for (i = 0; i < imax; i++) {
+		bi = bindItemArray[i];
+		namePath = bi[BI_NAME_PATH] || "";
+		if (typeof namePath !== "string") return formatError("bind name path is not a string", namePath, bi);
+
+		if (!namePath) {	//omitted "namePath"
+			bi[BI_NAME_PATH] = lastName;	//fill back omitted "namePath"
+
+			if (i) {	//copy other omitted item from previous value
+				if (!bi[BI_TYPE]) {
+					bi[BI_TYPE] = bindItemArray[i - 1][BI_TYPE];	//fill back omitted "type"
+					if (!bi[BI_TYPE_OPTION]) bi[BI_TYPE_OPTION] = bindItemArray[i - 1][BI_TYPE_OPTION];	//fill back omitted typeOption | "typeItem"
 				}
 			}
 		}
-		else if( namePath!=lastName ){		//new namePath
-			elLast= ht.queryByName( el, namePath );
-			if( !elLast ) return formatError("bind name path unfound", namePath, bi );
-			nm[namePath]= ht.eleId(elLast);
-			lastName= namePath;
-			
-			if( bi.length===1 ) continue;	//only build name mapping
+		else if (namePath != lastName) {		//new namePath
+			elLast = ht.queryByName(el, namePath);
+			if (!elLast) return formatError("bind name path unfound", namePath, bi);
+			nm[namePath] = ht.eleId(elLast);
+			lastName = namePath;
+
+			if (bi.length === 1) continue;	//only build name mapping
 		}
-		
-		ret= bindElement( elLast, obj, bi );
-		if( ret instanceof Error ) return ret;
+
+		ret = bindElement(elLast, obj, bi);
+		if (ret instanceof Error) return ret;
 	}
 	return nm;
 }
@@ -402,115 +402,115 @@ var bindByName= function( el, obj, bindItemArray ){
 				
 			
 */
-var bindUi= function( el, obj, config, cb ){
+var bindUi = function (el, obj, config, cb) {
 	//arguments
-	if( typeof config==="function" && arguments.length==3 ){ cb= config; config= null; }
-	
-	if( ! config ){ config= obj.config || obj; }
-	
-	el= ht(el);
-	
+	if (typeof config === "function" && arguments.length == 3) { cb = config; config = null; }
+
+	if (!config) { config = obj.config || obj; }
+
+	el = ht(el);
+
 	//bind
-	cq( null,[
+	cq(null, [
 		//try load cssUrl
-		function( err, data, que){
-			if(err) return ht.Error(err);
-			
-			if( config.cssId && ht(config.cssId) ) return false;	//already loaded
-			if( ! config.cssUrl ) return true;		// 'true' to load from cssText
-			if( typeof config.cssUrlText ==="string" ) return true;
-			
-			if( cq.isQue(config.cssUrlText) ){
-				config.cssUrlText.join( function(err,data){ que.next(err,true); } );
+		function (err, data, que) {
+			if (err) return ht.Error(err);
+
+			if (config.cssId && ht(config.cssId)) return false;	//already loaded
+			if (!config.cssUrl) return true;		// 'true' to load from cssText
+			if (typeof config.cssUrlText === "string") return true;
+
+			if (cq.isQue(config.cssUrlText)) {
+				config.cssUrlText.join(function (err, data) { que.next(err, true); });
 				return;
 			}
-			
-			config.cssUrlText= que;
-			ht.httpRequest( config.cssUrl, 'GET', '',
-				function(err,data){
-					config.cssUrlText= err ? (""+ err.error) : ( data.responseText||"" );
-					
-					if( err ) { que.next(err.error, true); return; }	// 'true' to load from cssText
-					
-					que.next(null,true);
+
+			config.cssUrlText = que;
+			ht.httpRequest(config.cssUrl, 'GET', '',
+				function (err, data) {
+					config.cssUrlText = err ? ("" + err.error) : (data.responseText || "");
+
+					if (err) { que.next(err.error, true); return; }	// 'true' to load from cssText
+
+					que.next(null, true);
 				}
 			);
 		},
 		//add cssUrlText/cssText
-		function( err, data, que){
-			if(err && data!==true ) return ht.Error(err);	//try load text even error occur
-			
-			if( data && (config.cssUrlText || config.cssText)  && !( config.cssId && ht(config.cssId) ) ){
-				ht.addCssText(config.cssUrlText || config.cssText,config.cssId || (config.cssId=ht.eleId(null,"bind-css-")) );
+		function (err, data, que) {
+			if (err && data !== true) return ht.Error(err);	//try load text even error occur
+
+			if (data && (config.cssUrlText || config.cssText) && !(config.cssId && ht(config.cssId))) {
+				ht.addCssText(config.cssUrlText || config.cssText, config.cssId || (config.cssId = ht.eleId(null, "bind-css-")));
 				//console.log("addCssText " + config.cssId );
 			}
 			return true;
 		},
 		//try load htmlUrl
-		function( err, data, que){
-			if(err) return ht.Error(err);
-			
-			if( ! config.htmlUrl ) return true;		// 'true' to load from htmlText
-			if( typeof config.htmlUrlText ==="string" ) return true;
-			
-			if( cq.isQue(config.htmlUrlText) ){
-				config.htmlUrlText.join( function(err,data){ que.next(err,true); } );
+		function (err, data, que) {
+			if (err) return ht.Error(err);
+
+			if (!config.htmlUrl) return true;		// 'true' to load from htmlText
+			if (typeof config.htmlUrlText === "string") return true;
+
+			if (cq.isQue(config.htmlUrlText)) {
+				config.htmlUrlText.join(function (err, data) { que.next(err, true); });
 				return;
 			}
-			
-			config.htmlUrlText= que;
-			ht.httpRequest( config.htmlUrl, 'GET', '',
-				function(err,data){
-					config.htmlUrlText= err ? (""+err.error) : (data.responseText||"");
-					
-					if( err ) { que.next(err.error, true); return; }	// 'true' to load from htmlText
-					
-					que.next(null,true);
+
+			config.htmlUrlText = que;
+			ht.httpRequest(config.htmlUrl, 'GET', '',
+				function (err, data) {
+					config.htmlUrlText = err ? ("" + err.error) : (data.responseText || "");
+
+					if (err) { que.next(err.error, true); return; }	// 'true' to load from htmlText
+
+					que.next(null, true);
 				}
 			);
 		},
 		//set htmlText - bindByName - install name-mapping tools
-		function( err, data, que){
-			if(err && data!==true ) return ht.Error(err);	//try load text even error occur
-			
+		function (err, data, que) {
+			if (err && data !== true) return ht.Error(err);	//try load text even error occur
+
 			//set htmlUrlText/htmlText
-			if( data && (config.htmlUrlText || config.htmlText) ){
+			if (data && (config.htmlUrlText || config.htmlText)) {
 				el.innerHTML = (config.htmlUrlText || config.htmlText).replace(/\{\{\s*([^\s\}\:]+)\s*(\:([^\}]*))?\}\}/g, "<span name='$1'>$3</span>");
 			}
-			
+
 			//bindByName
-			if( config.bindArray ){
-				var nm= bindByName( el, obj, config.bindArray );
-				if( nm instanceof Error ) return nm;
-				
+			if (config.bindArray) {
+				var nm = bindByName(el, obj, config.bindArray);
+				if (nm instanceof Error) return nm;
+
 				//install name-mapping tools
-				if( nm ){
-					if( config.nameTool==="disable" || (typeof config.nameTool!=="undefined" && !config.nameTool ) ){}	//disable
-					else if( config.nameTool && config.nameTool.slice(0,4)==="dyna" ){
-						var elId= ht.eleId(el);
-						obj.nme=function(namePath){ return ht.queryByName(elId,namePath);}
+				if (nm) {
+					if (config.nameTool === "disable" || (typeof config.nameTool !== "undefined" && !config.nameTool)) { }	//disable
+					else if (config.nameTool && config.nameTool.slice(0, 4) === "dyna") {
+						var elId = ht.eleId(el);
+						obj.nme = function (namePath) { return ht.queryByName(elId, namePath); }
 					}
-					else{
-						obj.nme= function(namePath){ return (namePath in nm) ? document.getElementById(nm[namePath]) : null; }
+					else {
+						obj.nme = function (namePath) { return (namePath in nm) ? document.getElementById(nm[namePath]) : null; }
 					}
 				}
 			}
-			
+
 			return true;
 		},
-		function( err, data, que){
-			cb( err, data );
-			que.next(err,data);
+		function (err, data, que) {
+			cb(err, data);
+			que.next(err, data);
 		},
 	]);
-	
-	
+
+
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////
 // export module
 
-module.exports= Object.assign(
+module.exports = Object.assign(
 	ht,
 	{
 		bindElement: bindElement,
