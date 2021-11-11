@@ -1,5 +1,6 @@
 
-var myObjClass2={
+// global, for html page
+myObjClass2={
 	config: {
 		cssUrl: "/bind-ui/test/2/2.css",
 		htmlUrl: "/bind-ui/test/2/2.html",
