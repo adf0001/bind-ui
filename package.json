@@ -1,6 +1,6 @@
 {
   "name": "bind-ui",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "htm-tool bind-ui module",
   "main": "bind-ui.js",
   "scripts": {

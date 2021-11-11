@@ -36,10 +36,14 @@ var ele = require("element-tool");
 var query_by_name_path = require("query-by-name-path");
 var add_css_text = require("add-css-text");
 
-var { findWithFilter, mapValue, enclosePropertyDescriptor } = require("script-tool");
+var script_tool = require("script-tool");
+var findWithFilter = script_tool.findWithFilter,
+	mapValue = script_tool.mapValue,
+	enclosePropertyDescriptor = script_tool.enclosePropertyDescriptor;
 
-var { observeSingleMutation, dispatchEventByName } = require("dom-document-tool");
-
+var dom_document_tool = require("dom-document-tool");
+var observeSingleMutation = dom_document_tool.observeSingleMutation,
+	dispatchEventByName = dom_document_tool.dispatchEventByName;
 
 //////////////////////////////////////////////////////////////////////////////////////////
 // bind element & bind by name
