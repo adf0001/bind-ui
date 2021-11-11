@@ -1,9 +1,14 @@
 # bind-ui
 htm-tool bind-ui module
 
-## example
+# Install
 ```
-var ht= require( "bind-ui" );
+npm install bind-ui
+```
+
+# Usage
+```javascript
+var bindUi= require( "bind-ui" );
 
 var myObj={
 	config: {
@@ -23,5 +28,6 @@ var myObj={
 	toggleRed: function(){ this.txtRed=!this.txtRed; },
 }
 
-ht.bindUi( "div1", myObj );
+bindUi( "div1", myObj );
+
 ```
