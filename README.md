@@ -8,7 +8,7 @@ npm install bind-ui
 
 # Usage
 ```javascript
-var bindUi= require( "bind-ui" );
+var bind_ui= require( "bind-ui" );
 
 var myObj={
 	config: {
@@ -17,9 +17,9 @@ var myObj={
 			"<label><input name='chk1' type=checkbox ></input>chk1</label> "+
 			"<button name='btn'>toggle</button> ",
 		bindArray:[
-			["sp1","class","my-cls1","txtRed",2],
-			["chk1","prop","checked","txtRed",2],
-			["btn","evt","click","toggleRed"],
+			"sp1",["class","my-cls1","txtRed",2],
+			"chk1",["prop","checked","txtRed",2],
+			"btn",["evt","click","toggleRed"],
 		],
 	},
 	
@@ -28,6 +28,6 @@ var myObj={
 	toggleRed: function(){ this.txtRed=!this.txtRed; },
 }
 
-bindUi( "div1", myObj );
+bind_ui( "div1", myObj );
 
 ```
