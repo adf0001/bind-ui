@@ -55,8 +55,9 @@ var installMappingTool = function (mode, obj, elId, nm) {
 			"disable"/false
 			
 				don't add name mapping tools
-				
-			
+
+		.init					//init function, or function name for obj[config.init](el)
+
 */
 
 //bind_ui = function (el, obj [, [config,] cb] )
@@ -124,7 +125,7 @@ module.exports = function (el, obj, config, cb) {
 			);
 		},
 		cq.if(true, null, cq.joinAt(config.joinHtml = config.joinHtml || {}, "loadHtmlUrl")),
-		//set htmlText - bind_element - install name-mapping tools
+		//set htmlText - bind_element - install name-mapping tools - call init entry
 		function (err, data, que) {
 			if (err) return que.final(err);
 
@@ -140,6 +141,16 @@ module.exports = function (el, obj, config, cb) {
 
 				//install name-mapping tools
 				if (nm) installMappingTool(config.nameTool, obj, el, nm);
+			}
+
+			//init entry
+			var typeofInit = typeof (config.init);
+
+			if (typeofInit === "function") {
+				config.init.call(obj, el);
+			}
+			else if (typeofInit === "string") {
+				if (obj && typeof (obj[config.init]) === "function") obj[config.init](el);
 			}
 
 			return true;

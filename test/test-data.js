@@ -26,11 +26,16 @@ module.exports = {
 					"chk2", ["prop", "checked", "txtRed", 2],
 					"btn", ["evt", "click", "toggleRed"],
 				],
+
+				init: "init",
 			},
 
 			txtRed: true,
 
 			toggleRed: function () { this.txtRed = !this.txtRed; },
+
+			init: function (el) { console.log("init 1, " + this.nme("").id) },
+
 		}
 
 		var anyFail = false;
@@ -56,7 +61,11 @@ module.exports = {
 			txtRed: true,
 
 			toggleRed: function () { this.txtRed = !this.txtRed; },
+
+			init2: function (el) { console.log("init 2, " + this.nme("").id) },
 		}
+
+		myObjClass.config.init = myObjClass.init2;
 
 		var anyFail = false;
 		bind_ui(ele('divResult3').childNodes[0], Object.create(myObjClass), null, function (err, data) { if (err) console.log(err); anyFail = anyFail || err; showResult(anyFail || data, 2, anyFail || false); });
