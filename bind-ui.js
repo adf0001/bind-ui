@@ -157,6 +157,8 @@ module.exports = function (el, obj, config, cb) {
 		},
 		function (err, data, que) {
 			if (cb) cb(err, data);
+			else if (err) console.log(err);
+
 			que.next(err, data);
 		},
 	]);
