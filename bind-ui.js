@@ -11,14 +11,22 @@ var add_css_text = require("add-css-text");
 var bind_element = require("bind-element");
 
 //install mapping tool
-var installMappingTool = function (mode, obj, elId, nm) {
-	if (mode === "disable" || (typeof mode !== "undefined" && !mode)) { }	//disable
-	else if (mode && mode.slice(0, 4) === "dyna") {
-		elId = ele.id(elId);
-		obj.nme = function (namePath) { return query_by_name_path(elId, namePath); }
+var installMappingTool = function (mode, obj, nm) {
+	if (mode === "disable" || (typeof mode !== "undefined" && !mode)) return;	//disable
+
+	var topId = nm[""];
+	if (mode && mode.slice(0, 4) === "dyna") {
+		obj.nme = function (namePath) {
+			return query_by_name_path(topId, namePath);
+		}
 	}
 	else {
-		obj.nme = function (namePath) { return (namePath in nm) ? document.getElementById(nm[namePath]) : null; }
+		obj.nme = function (namePath) {
+			if (namePath in nm) return document.getElementById(nm[namePath]);
+			var el = query_by_name_path(topId, namePath);
+			if (el) nm[namePath] = ele.id(el);	//cache
+			return el;
+		}
 	}
 }
 
@@ -131,7 +139,8 @@ module.exports = function (el, obj, config, cb) {
 
 			//set htmlUrlText/htmlText
 			if (config.htmlUrlText || config.htmlText) {
-				el.innerHTML = (config.htmlUrlText || config.htmlText).replace(/\{\{\s*([^\s\}\:]+)\s*(\:([^\}]*))?\}\}/g, "<span name='$1'>$3</span>");
+				el.innerHTML = (config.htmlUrlText || config.htmlText).
+					replace(/\{\{\s*([^\s\}\:]+)\s*(\:([^\}]*))?\}\}/g, "<span name='$1'>$3</span>");
 			}
 
 			//bindByName
@@ -140,7 +149,7 @@ module.exports = function (el, obj, config, cb) {
 				if (nm instanceof Error) return nm;
 
 				//install name-mapping tools
-				if (nm) installMappingTool(config.nameTool, obj, el, nm);
+				if (nm) installMappingTool(config.nameTool, obj, nm);
 			}
 
 			//init entry
