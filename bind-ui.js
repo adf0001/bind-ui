@@ -69,6 +69,7 @@ var installMappingTool = function (mode, obj, nm) {
 */
 
 //bind_ui = function (el, obj [, [config,] cb] )
+//return obj
 module.exports = function (el, obj, config, cb) {
 	//arguments
 	if (typeof config === "function" && arguments.length == 3) { cb = config; config = null; }
@@ -172,4 +173,5 @@ module.exports = function (el, obj, config, cb) {
 		},
 	]);
 
+	return obj;
 }
