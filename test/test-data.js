@@ -1,5 +1,6 @@
 
-// global, for html page
+//global variable, for html page, refer tpsvr @ npm.
+
 bind_ui = require("../bind-ui.js");
 ele = require("element-tool");
 query_by_name_path = require("query-by-name-path");

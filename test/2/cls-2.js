@@ -2,8 +2,8 @@
 // global, for html page
 myObjClass2 = {
 	config: {
-		cssUrl: "/bind-ui/test/2/2.css",
-		htmlUrl: "/bind-ui/test/2/2.html",
+		cssUrl: window.location.href.replace(/[\/\\]test[\/\\].*/, "") + "/test/2/2.css",
+		htmlUrl: window.location.href.replace(/[\/\\]test[\/\\].*/, "") + "/test/2/2.html",
 
 		bindArray: [
 			"sp1", ["class", "my-cls1", "txtRed", 2],
