@@ -5,7 +5,8 @@
 
 var cq = require("callq");
 var http_request = require("browser-http-request");
-var ele = require("element-tool");
+var ele = require("ele-tool");
+var ele_id = require("ele-id");
 var query_by_name_path = require("query-by-name-path");
 var add_css_text = require("add-css-text");
 var bind_element = require("bind-element");
@@ -24,7 +25,7 @@ var installMappingTool = function (mode, obj, nm) {
 		obj.nme = function (namePath) {
 			if (namePath in nm) return document.getElementById(nm[namePath]);
 			var el = query_by_name_path(topId, namePath);
-			if (el) nm[namePath] = ele.id(el);	//cache
+			if (el) nm[namePath] = ele_id(el);	//cache
 			return el;
 		}
 	}
@@ -108,7 +109,7 @@ module.exports = function (el, obj, config, cb) {
 			if ((config.cssUrlText || config.cssText) && !(config.cssId && ele(config.cssId))) {
 				add_css_text(
 					config.cssUrlText || config.cssText,
-					config.cssId || (config.cssId = ele.id(null, "bind-css-"))
+					config.cssId || (config.cssId = ele_id(null, "bind-css-"))
 				);
 				//console.log("addCssText " + config.cssId );
 			}

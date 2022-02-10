@@ -1,6 +1,6 @@
 {
   "name": "bind-ui",
-  "version": "1.0.9",
+  "version": "1.0.10",
   "description": "htm-tool bind-ui module",
   "main": "bind-ui.js",
   "scripts": {
@@ -18,10 +18,11 @@
   "homepage": "https://github.com/adf0001/bind-ui#readme",
   "dependencies": {
     "add-css-text": "^1.0.1",
-    "bind-element": "^1.0.1",
-    "browser-http-request": "^1.0.3",
-    "callq": "^1.0.6",
-    "element-tool": "^1.0.2",
+    "bind-element": "^1.0.3",
+    "browser-http-request": "^1.0.6",
+    "callq": "^1.0.7",
+    "ele-id": "^1.0.2",
+    "ele-tool": "^1.0.1",
     "query-by-name-path": "^1.0.1"
   }
 }
