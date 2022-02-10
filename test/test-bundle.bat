@@ -5,7 +5,7 @@ chcp 65001
 set nodeModulesPath=D:\公共项目分类\module\tpsvr/node_modules
 set watchifyPath=%nodeModulesPath%/.bin/watchify
 
-title watchify - bind-ui
+rem title watchify - bind-ui
 
 if not exist ./bundle md bundle
 
