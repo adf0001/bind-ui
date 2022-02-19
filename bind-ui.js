@@ -79,6 +79,8 @@ module.exports = function (el, obj, config, cb) {
 
 	el = ele(el);
 
+	var returned;
+
 	//bind
 	cq(null, [
 		//get cssUrl to load
@@ -167,12 +169,22 @@ module.exports = function (el, obj, config, cb) {
 			return true;
 		},
 		function (err, data, que) {
-			if (cb) cb(err, data);
+			if (cb) {
+				if (returned) {
+					cb(err, data);
+				}
+				else {
+					//to ensure the caller get the returned obj, when all process is synac.
+					setTimeout(function () { cb(err, data); }, 0);
+				}
+			}
 			else if (err) console.log(err);
 
 			que.next(err, data);
 		},
 	]);
+
+	returned = true;
 
 	return obj;
 }

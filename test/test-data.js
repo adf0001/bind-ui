@@ -88,7 +88,18 @@ module.exports = {
 
 		var anyFail = false;
 		bind_ui(ele('divResult3').childNodes[0], Object.create(myObjClass3), null, function (err, data) { if (err) console.log(err); anyFail = anyFail || err; showResult(anyFail || data, 2, anyFail || false); });
-		bind_ui(ele('divResult3').childNodes[1], Object.create(myObjClass3), null, function (err, data) { if (err) console.log(err); anyFail = anyFail || err; showResult(anyFail || data, 2, anyFail || false); });
+
+		var ret = bind_ui(ele('divResult3').childNodes[1], Object.create(myObjClass3), null,
+			function (err, data) {
+				if (err) console.log(err);
+				anyFail = anyFail || err;
+				showResult(anyFail || data, 2, anyFail || false);
+
+				console.log(ret);
+				done(!(ret));	//ret is not undefined, when all process is synac
+			}
+		);
+
 	},
 
 };
