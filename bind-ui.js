@@ -148,8 +148,8 @@ module.exports = function (el, obj, config, cb) {
 			}
 
 			//bindByName
-			if (config.bindArray) {
-				var nm = bind_element.array(el, obj, config.bindArray);
+			if (config.bindArray || !(config.nameTool === "disable" || config.nameTool === false)) {
+				var nm = bind_element.array(el, obj, config.bindArray || []);
 				if (nm instanceof Error) return nm;
 
 				//install name-mapping tools
