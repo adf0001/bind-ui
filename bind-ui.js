@@ -5,7 +5,7 @@
 
 var cq = require("callq");
 var http_request = require("browser-http-request");
-var ele = require("ele-tool");
+var ele = require("get-element-by-id");
 var ele_id = require("ele-id");
 var query_by_name_path = require("query-by-name-path");
 var add_css_text = require("add-css-text");
